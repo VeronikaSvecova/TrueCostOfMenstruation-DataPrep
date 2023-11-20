@@ -1,0 +1,13 @@
+/*Výpočet denního nákladu na produkt. Vycházíme z doporučeného počtu kusů na den, který udává výrobce, 
+v případě tamponu a vložek, pak vycházíme z doporučení WHO.*/
+
+
+CREATE OR REPLACE TABLE SHOPY_FINAL_OUTPUT AS
+SELECT * 
+     , TRY_CAST("currentPrice" AS FLOAT)/TRY_CAST("Kusy" AS INTEGER) AS CENA_ZA_KUS
+     , CASE WHEN "Typ" in ('vložky', 'tampony') THEN CENA_ZA_KUS*5.3
+            WHEN "Typ" = 'menstruační kalhotky' THEN CENA_ZA_KUS/97.5*2
+            WHEN "Typ" = 'menstruační kalíšek' THEN CENA_ZA_KUS/(13*5*5)
+       ELSE NULL
+       END AS NAKLAD_DEN
+FROM UNION_ALL
