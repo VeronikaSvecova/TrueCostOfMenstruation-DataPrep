@@ -1,0 +1,44 @@
+/* Napojení očištěné tabulky na tabulku s počtem kusů.*/
+
+CREATE OR REPLACE TABLE LEKARNA_FINAL AS
+SELECT
+     LEKARNA_CLEAN."shop" AS "Shop"
+    ,LEKARNA_CLEAN."Brand" AS "Brand"
+    ,LEKARNA_CLEAN."itemName" AS "itemName"
+    ,LEKARNA_CLEAN."itemId" AS "itemId"
+    ,LEKARNA_CLEAN."currentPrice" AS "currentPrice"
+    ,LEKARNA_CLEAN."originalPrice" AS "originalPrice"
+    ,LEKARNA_CLEAN."officialSale" AS "officialSale"
+    ,LEKARNA_CLEAN."date" AS "date"
+    ,LEKARNA_CLEAN."itemUrl" AS "Url"
+    ,LEKARNA_CLEAN."itemImage" AS "itemImage"
+    ,LEKARNA_CLEAN."typ" AS "Typ"
+    ,LEKARNA_CLEAN."kategorie" AS "Kategorie"
+    ,"KUSY" AS "Kusy"
+    ,"Zeme" AS "Zeme"
+FROM LEKARNA_CLEAN
+LEFT JOIN LEKARNA_KUSY ON LEKARNA_CLEAN."itemUrl" = LEKARNA_KUSY."itemUrl"
+LEFT JOIN "Znacky_zeme" ON LEKARNA_CLEAN."Brand" = "Znacky_zeme"."Znacka";
+
+
+/* Union all všech tabulek s doplněným počtem kusů na produkt */
+CREATE OR REPLACE TABLE UNION_ALL AS
+SELECT *
+FROM ROHLIK_FINAL
+UNION ALL
+SELECT *
+FROM TESCO_FINAL
+UNION ALL
+SELECT *
+FROM GLOBUS_FINAL
+UNION ALL
+SELECT *
+FROM PILULKA_FINAL
+UNION ALL
+SELECT *
+FROM DM_FINAL
+UNION ALL
+SELECT *
+FROM TETA_FINAL
+UNION ALL
+SELECT *
