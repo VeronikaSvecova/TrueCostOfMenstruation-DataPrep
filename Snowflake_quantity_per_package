@@ -1,0 +1,15 @@
+/*Vytažení počtů kusů z názvu proudktu. Tento postup nefungoval pro celý dataset daných e-shopů.
+Museli jsme tedy kombinovat více postupů. 
+1. Scraping počtu kusů přes itemUrl v Pythonu
+2. Využití níže uvedeného kódu ve Snowflake a následný distinct "itemUrl". Při využití distinct "itemUrl" 
+jsme narazili na jednotky záznamů, u kterých bylo potřeba doplnit počet kusů manuálně, a to skrze "itemUrl",
+pokud byl link aktivní, nebo skrze "itemImage".
+
+CREATE OR REPLACE TEMPORARY TABLE "LEKARNA_KUSY" AS
+SELECT
+    SPLIT_PART("itemName", ' ',-2) as KUSY
+    ,"itemUrl"
+    ,"itemImage"
+    ,"itemName"
+    , "Brand"
+FROM "LEKARNA_CLEAN"
