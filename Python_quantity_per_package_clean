@@ -1,0 +1,37 @@
+# Výsledný soubor získáním scrapování rohlik.cz obsahoval hodnoty včetně 'ks'. 
+#'ks' tedy odstraňujeme. Nejdřív rozdělíme csv soubor na seznam. Na sudých 
+# pozicích je URL proudktu. Na lichých pozicích je počet kusů včetně 'ks'. 
+# V cyklu proto seznam_lichy očistíme o 'ks' a přes zip spojujeme do výsledného
+# seznamu, který exportujeme do csv.  
+import csv
+seznam = []
+seznam_sude = []
+seznam_liche = []
+seznam_final = []
+
+with open("/Users/veronika.svecova/Czechitas_Project/rohlik.csv", encoding = "utf-8") as file:
+    for line in file:
+        line = line.strip()
+        line = line[1:]
+        seznam.append(line)
+seznam_sude = seznam[0::2]
+#print(seznam_sude)
+seznam_liche = seznam[1::2]
+print(seznam_liche)
+for item in seznam_liche:
+    item = item[1:3].split()[0]
+    seznam_final.append(item)
+#print(seznam_final)
+#print(seznam_sude)
+seznam_vystup = list(zip(seznam_sude, seznam_final))
+#print(seznam_vystup)
+
+csv_filename = 'rohlik_keboola.csv'
+
+with open(csv_filename, 'w', newline='') as csvfile:
+    # Vytvoření objektu writer pro zápis do CSV
+    csv_writer = csv.writer(csvfile)
+    # csv_writer.writerow(['První sloupec', 'Druhý sloupec'])
+    csv_writer.writerows(seznam_vystup)
+
+print(f"Data byla exportována do {csv_filename}")
