@@ -1,0 +1,120 @@
+/*Čištění dat pro UNION tabulek jednotlivých e-shopů.Původní datasety v tomto kroce zeštíhlíme z 
+10 656 000 000 záznamů na 1 600 000 záznamů. Produkty třídíme do kategorií, doplňujeme značky a typ. 
+V tuto fázi chybí počet kusů, který bude potřeba doplnit.
+*/
+
+CREATE OR REPLACE TABLE LEKARNA_CLEAN AS
+SELECT 
+    CASE WHEN "itemName" ILIKE'Always%' THEN 'ALWAYS'
+   WHEN "itemName" ILIKE'%Bellinda%' THEN 'BELLINDA'
+   WHEN "itemName" ILIKE'%Tampax%' THEN 'TAMPAX'
+   WHEN "itemName" ILIKE'%snuggs%' THEN 'SNUGGS'
+   WHEN "itemName" ILIKE'%jessa%' THEN 'JESSA'
+   WHEN "itemName" ILIKE'%Naturella%' THEN 'NATURELLA'
+   WHEN "itemName" ILIKE'%RIA%' THEN 'RIA'
+   WHEN "itemName" ILIKE'%o.b.%' THEN 'O.B.'
+   WHEN "itemName" ILIKE'%selenacare%' THEN 'SELENACARE'
+   WHEN "itemName" ILIKE'%GENTLEDAY%' THEN 'GENTLE DAY'
+   WHEN "itemName" ILIKE'%KOTEX%' THEN 'KOTEX'
+   WHEN "itemName" ILIKE'%T.O.C%' THEN 'T.O.C'
+   WHEN "itemName" ILIKE'%EBELIN%' THEN 'EBELIN'
+   WHEN "itemName" ILIKE'%MOONCUP%' THEN 'MOONCUP'
+   WHEN "itemName" ILIKE'%NATRACARE%' THEN 'NATRACARE'
+   WHEN "itemName" ILIKE'%CARIN%' THEN 'CARIN'
+   WHEN "itemName" ILIKE'%NAT%' THEN 'ECO BY NATY'
+   WHEN "itemName" ILIKE'%BELLA%' THEN 'BELLA'
+   WHEN "itemName" ILIKE'%ORGANYC%' THEN 'ORGANYC'
+   WHEN "itemName" ILIKE'%LIBRESSE%' THEN 'LIBRESSE'
+   WHEN "itemName" ILIKE'%YUUKI%' THEN 'YUUKI'
+   WHEN "itemName" ILIKE'%CAREFREE%' THEN 'CAREFREE'
+   WHEN "itemName" ILIKE'%SENTA PROTECT%' THEN 'SENTA PROTECT'
+   WHEN "itemName" ILIKE'%MONETA%' THEN 'MONETA'
+   WHEN "itemName" ILIKE'%MASMI%' THEN 'MASMI'
+   WHEN "itemName" ILIKE'%ATTENDS%' THEN 'ATTENDS'
+   WHEN "itemName" ILIKE'%PINKE WELLE%' THEN 'PINKE WELLE'
+   WHEN "itemName" ILIKE'%FUN FACTORY%' THEN 'FUN FACTORY'
+   WHEN "itemName" ILIKE'%SATISFYER%' THEN 'SATISFYER'
+   WHEN "itemName" ILIKE'%ELLEN%' THEN 'ELLEN'
+   WHEN "itemName" ILIKE'%SAFORELLE%' THEN 'SAFORELLE'
+   WHEN "itemName" ILIKE'%TIERRA VERDE%' THEN 'TIERRA VERDE'
+   WHEN "itemName" ILIKE'%evita%' THEN 'EVITA'
+   WHEN "itemName" ILIKE'%LADYCUP%' THEN 'LADYCUP'
+   WHEN "itemName" ILIKE'%GENTLE DAY%' THEN 'GENTLE DAY'
+   WHEN "itemName" ILIKE'%INTIMEA%' THEN 'SABA INTIMA'
+   WHEN "itemName" ILIKE'%TENA%' THEN 'TENA'
+   WHEN "itemName" ILIKE'%DISCREET%' THEN 'DISCREET'
+   ELSE 'Zařadit'
+   END AS "Brand"
+    ,"itemName"
+    ,IFF("shop" = '', 'lekarna', 'lekarna') AS "shop"
+    ,"itemId"
+    ,"currentPrice"
+    ,"originalPrice"
+    ,"officialSale"
+    ,"date"
+    ,"itemUrl"
+    ,"itemImage" 
+    ,CASE 
+    WHEN "itemName" ILIKE '%vložky%' THEN 'vložky'
+    WHEN "itemName" ILIKE '%tampony%' OR "itemName" ILIKE '%tampóny%' THEN 'tampony' 
+    WHEN "itemName" ILIKE '%kalhotky%' THEN 'menstruační kalhotky'
+    WHEN "itemName" ILIKE '%kalíšek%' THEN 'menstruační kalíšek'
+    ELSE 'někde máme chybu'
+    END as "typ"
+    ,CASE
+    WHEN "itemName" ILIKE '%vložky%' OR "itemName" ILIKE '%tampony%' OR "itemName" ILIKE         '%tampóny%' AND "itemName" NOT ILIKE '%eco%' AND "itemName" NOT ILIKE '%eko%' THEN            'klasika'
+    WHEN "itemName" ilike '%kalíšek%' OR "itemName" ilike '%kalhotky%' THEN 'alternativa'
+    WHEN "itemName" ilike '%eco%' OR "itemName" ilike '%eko%' THEN 'eco'
+    ELSE 'něke máme chybu'
+    END as "kategorie"
+FROM "lekarna_cz"
+WHERE 
+    ("itemName" ILIKE '%vložky%' 
+    AND "itemName" NOT ILIKE '%porodnické%' 
+    AND "itemName" NOT ILIKE '%skelet%' 
+    AND "itemName" NOT ILIKE '%slipové%'
+    AND "itemName" NOT ILIKE '%int%' 
+    AND "itemName" NOT ILIKE '%gel%'
+    AND "itemName" NOT ILIKE '%dr.grepl%'
+    AND "itemName" NOT ILIKE '%dr. grepl%'
+    AND "itemName" NOT ILIKE '%bot%'
+    AND "itemName" NOT ILIKE '%scholl%'
+    AND "itemName" NOT ILIKE '%prsní%' 
+    AND "itemName" NOT ILIKE '%podprsen%' 
+    AND "itemName" NOT ILIKE '%polo%' 
+    AND "itemName" NOT ILIKE '%deo%'
+    AND "itemName" NOT ILIKE '%absorpční%'
+    AND "itemName" NOT ILIKE '%inkont%' 
+    AND "itemName" NOT ILIKE '%do bot%' 
+    AND "itemName" NOT ILIKE '%poporodní%'
+    AND "itemName" NOT ILIKE '%porod%'
+    AND "itemName" NOT ILIKE '%mateřské%'
+    AND "itemName" NOT ILIKE '%porodu%'
+    AND "itemName" NOT ILIKE '%obuv%'
+    AND "itemName" NOT ILIKE '%noh%'
+    AND "itemName" NOT ILIKE '%antibakterial%'
+    AND "itemName" NOT ILIKE '%carbon%'
+    AND "itemName" NOT ILIKE '%orto%') 
+    OR  ("itemName" ILIKE '%menstruační kalíšek%') 
+    OR  (("itemName" ILIKE '%tampony%' 
+    OR  "itemName" ILIKE '%tampóny%') 
+    AND "itemName" NOT ILIKE '%odličovací%'
+    AND "itemName" NOT ILIKE '%peel%'
+    AND "itemName" NOT ILIKE '%kosm%'
+    AND "itemName" NOT ILIKE '%obvaz%'
+    AND "itemName" NOT ILIKE '%steril%'
+    AND "itemName" NOT ILIKE '%odlakovaci%'
+    AND "itemName" NOT ILIKE '%čisticí%' 
+    AND "itemName" NOT ILIKE '%oční%'
+    AND "itemName" NOT ILIKE '%vat%' 
+    AND "itemName" NOT ILIKE '%oči%' 
+    AND "itemName" NOT ILIKE '%čistící%' 
+    AND "itemName" NOT ILIKE '%kosmetické%'
+    AND "itemName" NOT ILIKE '%bioderma%'
+    AND "itemName" NOT ILIKE '%lak%'
+    AND "itemName" NOT ILIKE '%podprs%'
+    AND "itemName" NOT ILIKE '%prs%'
+    AND "itemName" NOT ILIKE '%bavl%'
+    AND "itemName" NOT ILIKE '%livsane%')
+    OR  "itemName" ILIKE '%menstruační kalhotky%'
+; 
